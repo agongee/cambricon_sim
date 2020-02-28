@@ -1,4 +1,8 @@
-VLOAD   $3, $0, #100
-MLOAD   $4, $2, #300
-MMV     $7, $1, $4, $3, $0
-VAV
+VLOAD   $3, $0, #100        // load input vector from address (100)
+MLOAD   $4, $2, #300        // load weight matrix from address (300)
+MMV     $7, $1, $4, $3, $0  // Wx
+VAV     $8, $1, $7, $5      // tmp=Wx+b
+VEXP    $9, $1, $8          // exp(tmp)
+VAS     $10, $1, $9, #1     // 1+exp(tmp)
+VDV     $6, $1, $9, $10     // y=exp(tmp)/(1+exp(tmp))
+VSTORE  $6, $1, #200        // store output vector to address (200)
