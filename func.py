@@ -35,12 +35,11 @@ class ScalarFunc:
         return temp_v, temp_r
 
 class VectorFunc:
-    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512, capacity=64):
+    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512):
         self.num = num
         self.c_cycle = c_cycle
         self.d_cycle = d_cycle
         self.width = width
-        self.capacity = capacity
         self.left = 0
 
     def request(self, inst):
@@ -71,12 +70,11 @@ class VectorFunc:
 
 
 class MatrixFunc:
-    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512, capacity=768):
+    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512):
         self.num = num
         self.c_cycle = c_cycle
         self.d_cycle = d_cycle
         self.width = width
-        self.capacity = capacity
         self.left = 0
 
     def request(self, inst):

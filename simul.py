@@ -14,6 +14,22 @@ from cache import Cache
 def debug(txt):
     print(txt)
 
+def delete_enter_comment(lines):
+    new_line = []
+    for i in lines:
+        if i == '\n':
+            pass
+        elif i[0:2] == '//':
+            pass
+        else:
+            try:
+                index = i.index('\n')
+                new_line.append(i[:index])
+            except ValueError:
+                new_line.append(i)
+    
+    return new_line
+
 # parse cmdline and return cfg, src file path
 def cmd_parse():
     parser = argparse.ArgumentParser(description='Simulation Arguments')
@@ -55,6 +71,7 @@ if __name__ == '__main__':
     # src 
     source = open(src, 'r')
     insts = source.readlines() # list of instructions
+    insts = delete_enter_comment(insts)
     
     # processor variables
     # commits = [0] * len(insts) # instruction commit 
