@@ -15,6 +15,7 @@ class IssueQueue:
         self.depth = depth
         self.width = width
         self.inst_queue = []
+        self.pass_inst = []
 
     def __str__(self):
         string = '===================\n'
@@ -34,15 +35,15 @@ class IssueQueue:
             self.inst_queue.append(temp)
     
     def dequeue(self):
-        insts = []
+        self.pass_inst = []
 
         if len(self.inst_queue) == 0:
             return []
         
-        while len(insts) < self.width and len(self.inst_queue) != 0:
+        while len(self.pass_inst) < self.width and len(self.inst_queue) != 0:
             if self.inst_queue[0].issue and self.issue_able(self.inst_queue[0].inst):
                 temp = self.inst_queue.pop(0)
-                insts.append(deepcopy(temp.inst))
+                self.pass_inst.append(deepcopy(temp.inst))
                 # print("DEQUEUE IF", len(self.inst_queue))
             else:
                 # print("DEQUEUE ELSE", len(self.inst_queue))
@@ -52,7 +53,7 @@ class IssueQueue:
             i.issue = True
 
         # print(insts)
-        return insts
+        return self.pass_inst
 
     def requeue(self, inst):
         self.inst_queue.insert(0, deepcopy(inst))
@@ -62,6 +63,11 @@ class IssueQueue:
 
     def issue_able(self, inst):
         temp_len = len(inst)
+        going_to = []
+
+        for i in self.pass_inst:
+            if i[0] == 'SLOAD':
+                going_to.append(int(i[1][1:]))
 
         for i in range(2, temp_len):
             if len(inst[i]) == 0:
@@ -70,7 +76,9 @@ class IssueQueue:
                 reg_num = int(inst[i][1:])
                 if self.reg.check_wb(reg_num):
                     return False
-        
+                if reg_num in going_to:
+                    return False
+
         return True
 
     def left(self):

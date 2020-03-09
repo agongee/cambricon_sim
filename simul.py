@@ -75,7 +75,7 @@ if __name__ == '__main__':
     
     # src instruction simulation
     while True:
-        debug(f'CYCLE:{cycle}, PC:{pc}')
+        # debug(f'CYCLE:{cycle}, PC:{pc}')
 
         # if issue queue is not full, i.e. can fetch and decode
         if not issuequeue.full() and not branch_block and pc < len(insts):
@@ -120,6 +120,7 @@ if __name__ == '__main__':
                 if i[0] != 'SSTORE':
                     # print("DEBUG: ", i)
                     reg.will_wb(reg_num)
+                i[1] = reg_num
                 for j in range(2, len(i)):
                     # print("DEBUG!!: ", i[j])
                     if len(i[j]) != 0:
@@ -131,23 +132,23 @@ if __name__ == '__main__':
                         i[j] = reg.get(i[j])
 
         next_scalar_agu = deepcopy(to_reg)
-
-        # debug(to_reg)
-
-
+        
         # scalar
-
+        v, r = scalarfunc.passing()
+        if v != [] and r != []:
+            val_scalar.extend(v)
+            reg_scalar.extend(r)
         reg.writeback(val_scalar, reg_scalar)
+        val_scalar = []
+        reg_scalar = []
 
         for i in to_scalar_agu:
             # print("DEBUG: ", i)
             if check_scalar_func(i) and i[0] != 'SSTORE':
-                v, r = scalarfunc.compute(i)
-                if v != None and r != None:
-                    val_scalar.append(v)
-                    reg_scalar.append(r)
-                print("DEBUG: ", i, v, r)
+                #print("SCALAR: ", i)
+                scalarfunc.compute(i)
             elif check_control_func(i):
+                #print("NONSCALAR: ", i)
                 if i[0] == 'JUMP':
                     pc += i[1]
                 elif i[1] != 0:
@@ -155,7 +156,7 @@ if __name__ == '__main__':
             elif i[0] == 'NOP':
                 pass
             else:
-                memoryqueue.enqueue(i)                
+                memoryqueue.enqueue(i)             
 
         to_cache, to_vector, to_matrix = \
              memoryqueue.dequeue(cache.left, vectorfunc.left, matrixfunc.left)
@@ -170,19 +171,17 @@ if __name__ == '__main__':
         ma_l = matrixfunc.left
         i_l = issuequeue.left()
         me_l = memoryqueue.left()
-        s_l = scalarfunc.left
         d_l = decoder.left() 
         f_l = fetcher.left()
         r_l = reg.left()
 
-        print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, SCALAR:{s_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
+        #print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
 
-        left = c_l + v_l + ma_l + i_l + me_l + s_l + d_l + f_l + r_l
-        print("LEFT ", left)
+        left = c_l + v_l + ma_l + i_l + me_l  + d_l + f_l + r_l
+        #print("LEFT ", left)
         if pc >= len(insts) and left == 0:
             break
-
-        if cycle > 20:
-            a = input()
         
         cycle += 1
+
+    print(f'{src} computation cycle: {cycle}')

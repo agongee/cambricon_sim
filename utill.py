@@ -41,6 +41,9 @@ def compute(type, operands):
     elif type == 'SRSH':
         return operands[1] >> operands[2], operands[0]
 
+    elif type == 'SLOAD':
+        return operands[1], operands[0]
+
     # transcendental
     # NEED
 
