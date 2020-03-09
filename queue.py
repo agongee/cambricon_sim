@@ -1,64 +1,123 @@
+from copy import deepcopy
+
+from reg import Reg
+from utill import check_control_func, check_func_type, check_matrix_func, check_scalar_func, check_vector_func, check_transfer
+
+
+class Inst:
+    def __init__(self, inst):
+        self.inst = deepcopy(inst)
+        self.issue = False
+
 class IssueQueue:
-    def __init__(self, capacity=24, width=2):
-        self.capacity = capacity
+    def __init__(self, reg: Reg, depth=24, width=2):
+        self.reg = reg
+        self.depth = depth
         self.width = width
         self.inst_queue = []
+
+    def __str__(self):
+        string = '===================\n'
+
+        for i in self.inst_queue:
+            string += str(i.inst)
+            string += '\n'
+
+        string += '===================\n'
+
+        return string
         
+
     def enqueue(self, inst):
-        if len(self.inst_queue) < self.capacity:
-            self.inst_queue.append(inst)
-        
-    # return inst to issue.
-    # if there is no possible inst to issue, return None
+        for i in inst:
+            temp = Inst(i)
+            self.inst_queue.append(temp)
+    
     def dequeue(self):
-        inst = []
-        index = 0
+        insts = []
 
-        while True:
-            if issue_able(self.inst_queue[index]):
-                inst.append(self.inst_queue.pop(index))
-                if len(inst) == self.width:
-                    break
+        if len(self.inst_queue) == 0:
+            return []
+        
+        while len(insts) < self.width and len(self.inst_queue) != 0:
+            if self.inst_queue[0].issue and self.issue_able(self.inst_queue[0].inst):
+                temp = self.inst_queue.pop(0)
+                insts.append(deepcopy(temp.inst))
+                # print("DEQUEUE IF", len(self.inst_queue))
             else:
-                index += 1
-            
-        return inst
+                # print("DEQUEUE ELSE", len(self.inst_queue))
+                break
+        
+        for i in self.inst_queue:
+            i.issue = True
 
-    def full(self):
-        return len(self.inst_queue) == 2
+        # print(insts)
+        return insts
 
     def requeue(self, inst):
-        self.inst_queue.insert(0, inst)
+        self.inst_queue.insert(0, deepcopy(inst))
 
+    def full(self):
+        return len(self.inst_queue) > (self.depth - self.width)
 
+    def issue_able(self, inst):
+        temp_len = len(inst)
+
+        for i in range(2, temp_len):
+            if len(inst[i]) == 0:
+                continue
+            if inst[i][0] == '$':
+                reg_num = int(inst[i][1:])
+                if self.reg.check_wb(reg_num):
+                    return False
+        
+        return True
+
+    def left(self):
+        return len(self.inst_queue)
 
 class MemoryQueue:
-    def __init__(self, capacity=2):
-        self.capacity = capacity
+    def __init__(self, depth=32):
+        self.depth = depth
         self.inst_queue = []
-        
+
     def enqueue(self, inst):
-        if len(self.inst_queue) < 2:
-            self.inst_queue.append(inst)
+        temp = Inst(inst)
+        self.inst_queue.append(temp)
+
+    def dequeue(self, c_cycle, v_cycle, m_cycle):
+        to_cache = None
+        to_vector = None
+        to_matrix = None
         
-    # return inst to issue.
-    # if there is no possible inst to issue, return None
-    def dequeue(self):
-        inst = []
-        index = -1
+        if len(self.inst_queue) == 0:
+            return to_cache, to_vector, to_matrix
+        elif not self.inst_queue[0].issue:
+            #print("DEQUEUE, NOT ISSUEABLE")
 
-        for i in range(len(self.inst_queue)):
-            if issue_able(self.inst_queue[i]): # NEED
-                index = i
+            for i in self.inst_queue:
+                i.issue = True
 
-        if index != -1:
-            inst = self.inst_queue.pop(index)
+            return to_cache, to_vector, to_matrix
 
-        return inst
+        temp_inst = self.inst_queue[0].inst
 
-    def full(self):
-        return len(self.inst_queue) == 2
+        # print(f"DEQUEUE, {c_cycle}, {v_cycle}, {m_cycle}")
 
-    def requeue(self, inst):
-        self.inst_queue.insert(0, inst)
+        if check_scalar_func(temp_inst) and c_cycle <= 1:
+            to_cache = deepcopy(temp_inst)
+            self.inst_queue.pop(0)
+        elif check_vector_func(temp_inst) and v_cycle <= 1:
+            to_vector = deepcopy(temp_inst)
+            self.inst_queue.pop(0)
+        elif check_matrix_func(temp_inst) and m_cycle <= 1:
+            to_matrix = deepcopy(temp_inst)
+            self.inst_queue.pop(0)
+       
+        for i in self.inst_queue:
+            i.issue = True
 
+        return to_cache, to_vector, to_matrix
+    
+    def left(self):
+        return len(self.inst_queue)

@@ -1,0 +1,12 @@
+SLOAD   $3, #0
+SLOAD   $0, #64
+VLOAD   $3, $0, #100
+SLOAD   $4, #100
+SLOAD   $2  #8340
+MLOAD   $4, $2, #300
+SLOAD   $7, #200
+SLOAD   $1, #150
+MMV     $7, $1, $4, $3, $0
+SLOAD   $8, #214
+SLOAD   $5, #364
+VLOAD   $5, $1, #100
