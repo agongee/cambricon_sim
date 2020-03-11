@@ -7,18 +7,15 @@ class Fetcher:
         self.fetched = []
 
     def get(self, pc, lines):
-
         # print("GET ", pc, len(lines))
-
         if pc+self.width < len(lines):
             temp = 0
             block = False
             for i in range(pc, pc+self.width):
                 temp += 1
-                if lines[i][0] == 'JUMP' or lines[i][0] == 'CB':
+                if lines[i][0:4] == 'JUMP' or lines[i][0:2] == 'CB':
                     block = True
                     break
-
             self.to_fetch = deepcopy(lines[pc:pc+temp])
             return pc + temp, block
         elif pc >= len(lines):
@@ -29,7 +26,7 @@ class Fetcher:
             block = False
             for i in range(pc, len(lines)):
                 temp += 1
-                if lines[i][0] == 'JUMP' or lines[i][0] == 'CB':
+                if lines[i][0:4] == 'JUMP' or lines[i][0:2] == 'CB':
                     block = True
                     break
             self.to_fetch = deepcopy(lines[pc:pc+temp])

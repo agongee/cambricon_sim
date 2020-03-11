@@ -89,19 +89,20 @@ if __name__ == '__main__':
     val_scalar = [] # scalar value to write back
     reg_scalar = [] # scalar register to write back on
     
+    print(f'Simulation Begin: {src}, {len(insts)}')
     
     # src instruction simulation
     while True:
         #if pc % 20 == 0:
-        debug(f'CYCLE:{cycle}, PC:{pc}')
+        #debug(f'CYCLE:{cycle}, PC:{pc}')
 
         # if issue queue is not full, i.e. can fetch and decode
         if not issuequeue.full() and not branch_block and pc < len(insts):
             # fetch
             fetcher.send()
             pc, branch_block = fetcher.get(pc, insts)
-            if branch_block:
-                print("BRANCH BLOCKED!")
+            #if branch_block:
+                #print("BRANCH BLOCKED!")
         else:
             fetcher.send()
            
@@ -152,17 +153,18 @@ if __name__ == '__main__':
         reg_scalar = []
 
         for i in to_scalar_agu:
-            # print("DEBUG: ", i)
+            #print("TO_SCALAR_AGU ", i)
             if check_scalar_func(i) and i[0] != 'SSTORE':
                 #print("SCALAR: ", i)
                 scalarfunc.compute(i)
             elif check_control_func(i):
-                print("CONTROL: ", i)
+                #print("CONTROL: ", i)
                 branch_block = False
                 if i[0] == 'JUMP':  # branch
                     pc += i[1]      
-                elif i[2] != 0:     # control branch
+                elif i[2] > 0:     # control branch
                     pc += i[1]
+                    #print(f'CB!!! i = {i[2]}, pc = {pc}')
             elif i[0] == 'NOP':
                 pass
             else:
@@ -189,11 +191,10 @@ if __name__ == '__main__':
 
         left = c_l + v_l + ma_l + i_l + me_l  + d_l + f_l + r_l
         #print("LEFT ", left)
-        if pc >= len(insts) and left == 0:
+        if pc >= len(insts) and left == 0 and not branch_block:
             break
          
-        if cycle > 40:
-            input()
+        
         
         cycle += 1
 

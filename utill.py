@@ -86,10 +86,7 @@ def check_control_func(inst):
     if len(inst) == 0:
         return False
     
-    if isinstance(inst, str):
-        return inst == 'JUMP' or inst == 'CB'
-    else:
-        return inst[0] == 'JUMP' or inst == 'CB'
+    return inst[0] == 'JUMP' or inst[0] == 'CB'
 
 
 def check_func_type(inst):

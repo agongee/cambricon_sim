@@ -43,24 +43,24 @@ SLOAD   $10,    #24
 SLOAD   $11,    #0
 SLOAD   $12,    #6
 SLOAD   $13,    #24
-SLOAD   $14,    #2
+SLOAD   $14,    #3
 
 // repeat for 14*14 times
 SLOAD   $17,    #196
 
 VLOAD   $11,    $10,   #100
 // init y
-SMOVE   $15,    #14
+SMOVE   $15,    $14
 // init x
-SMOVE   $16,    #14
+SMOVE   $16,    $14
 VGTM    $13,    $9,     #11,    #13
 SADD    $11,    $11,    $9
 SADD    $16,    $16,    #-1
 CB      #-4,    $16
 SADD    $15,    $15,    #-1
-CB      #-6,    $15
+CB      #-7,    $15
 VSTORE  $13,    $9,     #200
 
 SADD    $17,    $17,    #-1
-CB      #-11,   $17
+CB      #-12,   $17
 

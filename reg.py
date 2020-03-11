@@ -9,7 +9,7 @@ class Reg:
         if param[0] == '$':
             index = int(param[1:])
             if self.to_wb[index] == 1:
-                print("BLOCKED! ", index)
+                #print("BLOCKED! ", index)
                 return param
             return self.reg_file[index]
         elif param[0] == '#':
@@ -32,7 +32,7 @@ class Reg:
         for i in range(temp_len):
             temp_value = value[i]
             temp_index = index[i]
-            # print("WB ", temp_value, temp_index)
+            #print("WB ", temp_value, temp_index)
             if self.to_wb[temp_index] == 1:
                 self.to_wb[temp_index] = 0
                 self.reg_file[temp_index] = temp_value
