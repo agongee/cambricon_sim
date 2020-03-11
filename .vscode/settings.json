@@ -1,4 +1,7 @@
 {
     "python.pythonPath": "/home/taehun/anaconda3/bin/python",
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "files.associations": {
+        "mkl.h": "c"
+    }
 }

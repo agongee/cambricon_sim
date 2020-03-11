@@ -12,6 +12,7 @@ class Decoder:
     def recv(self, inst):
         if len(inst) != 0:
             self.to_decode = deepcopy(inst)
+            print("DECODE ", self.to_decode)
         else:
             self.to_decode = []
 

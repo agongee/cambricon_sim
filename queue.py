@@ -66,18 +66,29 @@ class IssueQueue:
         going_to = []
 
         for i in self.pass_inst:
-            if i[0] == 'SLOAD':
+            if check_scalar_func(i) and i[0] != 'SSTORE':
                 going_to.append(int(i[1][1:]))
 
-        for i in range(2, temp_len):
-            if len(inst[i]) == 0:
-                continue
-            if inst[i][0] == '$':
-                reg_num = int(inst[i][1:])
-                if self.reg.check_wb(reg_num):
-                    return False
-                if reg_num in going_to:
-                    return False
+        if check_scalar_func(inst):
+            for i in range(2, temp_len):
+                if len(inst[i]) == 0:
+                    continue
+                if inst[i][0] == '$':
+                    reg_num = int(inst[i][1:])
+                    if self.reg.check_wb(reg_num):
+                        return False
+                    if reg_num in going_to:
+                        return False
+        else:
+            for i in range(1, temp_len):
+                if len(inst[i]) == 0:
+                    continue
+                if inst[i][0] == '$':
+                    reg_num = int(inst[i][1:])
+                    if self.reg.check_wb(reg_num):
+                        return False
+                    if reg_num in going_to:
+                        return False
 
         return True
 

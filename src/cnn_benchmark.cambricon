@@ -1,31 +1,66 @@
-input(1@32x32)  -  C1(6@28x28,  K:  6@5x5)- S1(6@14x14, K: 2x2) 
-- C2(16@10x10, K:16@5x5) - S2(16@5x5, K: 2x2) 
-- F(120) - F(84)- output(10)
+//input(1@32x32)  -  C1(6@28x28,  K:  6@5x5)- S1(6@14x14, K: 2x2) 
+//- C2(16@10x10, K:16@5x5) - S2(16@5x5, K: 2x2) 
+//- F(120) - F(84)- output(10)
 
 // address, size
 SLOAD   $1, #0
-SLOAD   $2, #19600
+SLOAD   $2, #19600 
 SLOAD   $3, #19600
 SLOAD   $4, #25
 SLOAD   $5, #19750
 SLOAD   $6, #784
+// $7 -> output addr, $5 -> output base
+// $8 -> total size 784 * 6
 
 // in -> c1
-MMV     $5, $6, $1, $3, $4
+SMOVE   $7, $5
+MMV     $7, $6, $1, $3, $4
 SADD    $3, $3, $4
-SADD    $5, $5, $6
-MMV     $5, $6, $1, $3, $4
+SADD    $7, $7, $6
+MMV     $7, $6, $1, $3, $4
 SADD    $3, $3, $4
-SADD    $5, $5, $6
-MMV     $5, $6, $1, $3, $4
+SADD    $7, $7, $6
+MMV     $7, $6, $1, $3, $4
 SADD    $3, $3, $4
-SADD    $5, $5, $6
-MMV     $5, $6, $1, $3, $4
+SADD    $7, $7, $6
+MMV     $7, $6, $1, $3, $4
 SADD    $3, $3, $4
-SADD    $5, $5, $6
-MMV     $5, $6, $1, $3, $4
+SADD    $7, $7, $6
+MMV     $7, $6, $1, $3, $4
 SADD    $3, $3, $4
-SADD    $5, $5, $6
-MMV     $5, $6, $1, $3, $4
+SADD    $7, $7, $6
+MMV     $7, $6, $1, $3, $4
+SADD    $3, $3, $4
+SADD    $7, $7, $6
+
+SMUL    $8, $6, #6
+MSTORE  $7, $8, #100
 
 // c1 -> s1
+// POOL is emulated; just repeat
+SLOAD   $9,     #6
+SLOAD   $10,    #24
+SLOAD   $11,    #0
+SLOAD   $12,    #6
+SLOAD   $13,    #24
+SLOAD   $14,    #2
+
+// repeat for 14*14 times
+SLOAD   $17,    #196
+
+VLOAD   $11,    $10,   #100
+// init y
+SMOVE   $15,    #14
+// init x
+SMOVE   $16,    #14
+VGTM    $13,    $9,     #11,    #13
+SADD    $11,    $11,    $9
+SADD    $16,    $16,    #-1
+CB      #-4,    $16
+SADD    $15,    $15,    #-1
+CB      #-6,    $15
+VSTORE  $13,    $9,     #200
+
+SADD    $17,    $17,    #-1
+CB      #-11,   $17
+

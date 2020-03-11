@@ -44,6 +44,9 @@ def compute(type, operands):
     elif type == 'SLOAD':
         return operands[1], operands[0]
 
+    elif type == 'SMOVE':
+        return operands[1], operands[0]
+
     # transcendental
     # NEED
 

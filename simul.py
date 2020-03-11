@@ -92,37 +92,29 @@ if __name__ == '__main__':
     
     # src instruction simulation
     while True:
-        # debug(f'CYCLE:{cycle}, PC:{pc}')
+        #if pc % 20 == 0:
+        debug(f'CYCLE:{cycle}, PC:{pc}')
 
         # if issue queue is not full, i.e. can fetch and decode
         if not issuequeue.full() and not branch_block and pc < len(insts):
             # fetch
             fetcher.send()
-            pc = fetcher.get(pc, insts)
+            pc, branch_block = fetcher.get(pc, insts)
+            if branch_block:
+                print("BRANCH BLOCKED!")
         else:
             fetcher.send()
-
-        # debug(fetcher.to_decoder())
-        # a = input ()
-
-        # print("FETCHER ", len(fetcher.to_fetch))
            
         # decode
         decoder.send()
         decoder.decode()
         decoder.recv(fetcher.to_decoder())
 
-        # print("DECODER " , len(decoder.to_pass))
-
         # issue queue
         issuequeue.enqueue(decoder.to_issuequeue())      
 
-        # debug(issuequeue)
-
         # issue queue  
         to_reg = issuequeue.dequeue()
-
-        # debug(to_reg)
         
         # register
         if len(next_scalar_agu) == 0:
@@ -134,20 +126,20 @@ if __name__ == '__main__':
             # print("DEBUG: ", i)
             if check_scalar_func(i) and i[1][0] == '$':
                 reg_num = int(i[1][1:])
-                if i[0] != 'SSTORE':
-                    # print("DEBUG: ", i)
-                    reg.will_wb(reg_num)
                 i[1] = reg_num
                 for j in range(2, len(i)):
                     # print("DEBUG!!: ", i[j])
                     if len(i[j]) != 0:
                         i[j] = reg.get(i[j])
+                if i[0] != 'SSTORE':
+                    # print("DEBUG: ", i)
+                    reg.will_wb(reg_num)
+
             else:
                 for j in range(1, len(i)):
-                    # print("DEBUG!!: ", i[j])
                     if len(i[j]) != 0:
                         i[j] = reg.get(i[j])
-
+                        
         next_scalar_agu = deepcopy(to_reg)
         
         # scalar
@@ -165,11 +157,12 @@ if __name__ == '__main__':
                 #print("SCALAR: ", i)
                 scalarfunc.compute(i)
             elif check_control_func(i):
-                #print("NONSCALAR: ", i)
-                if i[0] == 'JUMP':
+                print("CONTROL: ", i)
+                branch_block = False
+                if i[0] == 'JUMP':  # branch
+                    pc += i[1]      
+                elif i[2] != 0:     # control branch
                     pc += i[1]
-                elif i[1] != 0:
-                    pc += i[2]
             elif i[0] == 'NOP':
                 pass
             else:
@@ -192,12 +185,15 @@ if __name__ == '__main__':
         f_l = fetcher.left()
         r_l = reg.left()
 
-        #print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
+        # print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
 
         left = c_l + v_l + ma_l + i_l + me_l  + d_l + f_l + r_l
         #print("LEFT ", left)
         if pc >= len(insts) and left == 0:
             break
+         
+        if cycle > 40:
+            input()
         
         cycle += 1
 

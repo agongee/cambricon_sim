@@ -11,14 +11,29 @@ class Fetcher:
         # print("GET ", pc, len(lines))
 
         if pc+self.width < len(lines):
-            self.to_fetch = deepcopy(lines[pc:pc+self.width])
-            return pc + self.width
+            temp = 0
+            block = False
+            for i in range(pc, pc+self.width):
+                temp += 1
+                if lines[i][0] == 'JUMP' or lines[i][0] == 'CB':
+                    block = True
+                    break
+
+            self.to_fetch = deepcopy(lines[pc:pc+temp])
+            return pc + temp, block
         elif pc >= len(lines):
             self.to_fetch = []
-            return pc
+            return pc, False
         else:
-            self.to_fetch = deepcopy(lines[pc:])
-            return len(lines)
+            temp = 0
+            block = False
+            for i in range(pc, len(lines)):
+                temp += 1
+                if lines[i][0] == 'JUMP' or lines[i][0] == 'CB':
+                    block = True
+                    break
+            self.to_fetch = deepcopy(lines[pc:pc+temp])
+            return pc+temp, block
 
     def send(self):
         if len(self.to_fetch) == 0:
