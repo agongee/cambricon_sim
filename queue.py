@@ -68,7 +68,6 @@ class IssueQueue:
         for i in self.pass_inst:
             if check_scalar_func(i) and i[0] != 'SSTORE':
                 going_to.append(int(i[1][1:]))
-
         if check_scalar_func(inst):
             for i in range(2, temp_len):
                 if len(inst[i]) == 0:

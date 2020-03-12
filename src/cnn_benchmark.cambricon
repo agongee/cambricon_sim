@@ -2,6 +2,7 @@
 //- C2(16@10x10, K:16@5x5) - S2(16@5x5, K: 2x2) 
 //- F(120) - F(84)- output(10)
 
+// input(1@32x32)  -  C1(6@28x28,  K:  6@5x5)
 // address, size
 SLOAD   $1, #0
 SLOAD   $2, #19600 
@@ -11,32 +12,25 @@ SLOAD   $5, #19750
 SLOAD   $6, #784
 // $7 -> output addr, $5 -> output base
 // $8 -> total size 784 * 6
+SLOAD   $30,    #30000
+SLOAD   $31,    #40000
 
-// in -> c1
+// computation
 SMOVE   $7, $5
+// repeat for 6 times (channels)
+SLOAD   $0, #7
 MMV     $7, $6, $1, $3, $4
+VEXP    $30, $6, $7
+VAS     $31, $6, $30, #1
+VDV     $7, $6, $30, $31
 SADD    $3, $3, $4
 SADD    $7, $7, $6
-MMV     $7, $6, $1, $3, $4
-SADD    $3, $3, $4
-SADD    $7, $7, $6
-MMV     $7, $6, $1, $3, $4
-SADD    $3, $3, $4
-SADD    $7, $7, $6
-MMV     $7, $6, $1, $3, $4
-SADD    $3, $3, $4
-SADD    $7, $7, $6
-MMV     $7, $6, $1, $3, $4
-SADD    $3, $3, $4
-SADD    $7, $7, $6
-MMV     $7, $6, $1, $3, $4
-SADD    $3, $3, $4
-SADD    $7, $7, $6
-
+SADD    $0,    $0,    #-1
+CB      #-5,   $0
 SMUL    $8, $6, #6
 MSTORE  $7, $8, #100
 
-// c1 -> s1
+// C1(6@28x28,  K:  6@5x5)- S1(6@14x14, K: 2x2)
 // POOL is emulated; just repeat
 SLOAD   $9,     #6
 SLOAD   $10,    #24
@@ -47,7 +41,6 @@ SLOAD   $14,    #3
 
 // repeat for 14*14 times
 SLOAD   $17,    #196
-
 VLOAD   $11,    $10,   #100
 // init y
 SMOVE   $15,    $14
@@ -60,7 +53,125 @@ CB      #-4,    $16
 SADD    $15,    $15,    #-1
 CB      #-7,    $15
 VSTORE  $13,    $9,     #200
-
 SADD    $17,    $17,    #-1
 CB      #-12,   $17
 
+// S1(6@14x14, K: 2x2)- C2(16@10x10, K:16@5x5)
+// address, size
+SLOAD   $1, #0
+SLOAD   $2, #15000
+SLOAD   $3, #15000
+SLOAD   $4, #150
+SLOAD   $5, #15150
+SLOAD   $6, #100
+// $7 -> output addr, $5 -> output base
+// $8 -> total size 784 * 6
+SLOAD   $30,    #30000
+SLOAD   $31,    #40000
+
+// computation
+SMOVE   $7, $5
+// repeat for 16 times (channels)
+SLOAD   $0, #16
+MMV     $7, $6, $1, $3, $4
+VEXP    $30, $6, $7
+VAS     $31, $6, $30, #1
+VDV     $7, $6, $30, $31
+SADD    $3, $3, $4
+SADD    $7, $7, $6
+SADD    $0,    $0,    #-1
+CB      #-5,   $0
+SMUL    $8, $6, #6
+MSTORE  $7, $8, #100
+
+// C2(16@10x10, K:16@5x5) - S2(16@5x5, K: 2x2) 
+// POOL is emulated; just repeat
+SLOAD   $9,     #16
+SLOAD   $10,    #64
+SLOAD   $11,    #0
+SLOAD   $12,    #16
+SLOAD   $13,    #64
+SLOAD   $14,    #3
+
+// repeat for 5*5 times
+SLOAD   $17,    #25
+VLOAD   $11,    $10,   #100
+// init y
+SMOVE   $15,    $14
+// init x
+SMOVE   $16,    $14
+VGTM    $13,    $9,     #11,    #13
+SADD    $11,    $11,    $9
+SADD    $16,    $16,    #-1
+CB      #-4,    $16
+SADD    $15,    $15,    #-1
+CB      #-7,    $15
+VSTORE  $13,    $9,     #200
+SADD    $17,    $17,    #-1
+CB      #-12,   $17
+
+// S2(16@5x5, K: 2x2) - F(120)
+SLOAD   $0,     #400
+SLOAD   $1,     #120
+SLOAD   $2,     #9600
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #400
+SLOAD   $6,     #520
+SLOAD   $7,     #640
+SLOAD   $8,     #760
+SLOAD   $9,     #900
+SLOAD   $10,    #1040
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200
+
+// F(120) - F(84)
+SLOAD   $0,     #120
+SLOAD   $1,     #84
+SLOAD   $2,     #10080
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #120
+SLOAD   $6,     #204
+SLOAD   $7,     #288
+SLOAD   $8,     #372
+SLOAD   $9,     #456
+SLOAD   $10,    #540
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200
+
+// F(84) - output(10)
+SLOAD   $0,     #84
+SLOAD   $1,     #10
+SLOAD   $2,     #840
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #84
+SLOAD   $6,     #94
+SLOAD   $7,     #104
+SLOAD   $8,     #114
+SLOAD   $9,     #124
+SLOAD   $10,    #134
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200

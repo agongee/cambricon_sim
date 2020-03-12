@@ -52,8 +52,29 @@ if __name__ == '__main__':
     
     # config
     if cfg != None:
-        config = configparser.ConfigParser()
-        config.read(cfg)
+        parser = configparser.ConfigParser()
+        parser.read(cfg)
+
+        cache_hit_latency = parser.getint('cache', 'hit_latency')
+        cache_miss_latency = parser.getint('cache', 'miss_latency')
+        cache_size = parser.getint('cache', 'size')
+
+        vector_compute_cycle = parser.getint('vector', 'compute_cycle')
+        vector_data_cycle = parser.getint('vector', 'data_cycle')
+
+        matrix_compute_cycle = parser.getint('matrix', 'compute_cycle')
+        matrix_data_cycle = parser.getint('matrix', 'data_cycle')
+
+    else:
+        cache_hit_latency = 4
+        cache_miss_latency = 10
+        cache_size = 32
+
+        vector_compute_cycle = 2
+        vector_data_cycle = 10
+
+        matrix_compute_cycle = 4
+        matrix_data_cycle = 10
     
     # microarch setup
     fetcher = Fetcher()
@@ -61,12 +82,10 @@ if __name__ == '__main__':
     memoryqueue = MemoryQueue()
     reg = Reg()
     scalarfunc = ScalarFunc()
-    vectorfunc = VectorFunc()
-    matrixfunc = MatrixFunc()
+    vectorfunc = VectorFunc(c_cycle=vector_compute_cycle, d_cycle=vector_data_cycle)
+    matrixfunc = MatrixFunc(c_cycle=matrix_compute_cycle, d_cycle=matrix_data_cycle)
     issuequeue = IssueQueue(reg)
-    cache = Cache()
-    
-     
+    cache = Cache(hit=cache_hit_latency, miss=cache_miss_latency, size=cache_size)
     
     # src 
     source = open(src, 'r')
