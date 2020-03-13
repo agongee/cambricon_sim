@@ -1,0 +1,49 @@
+// input(26) - H(93) - output(61)
+
+// input(26) - H(93)
+//input size
+SLOAD   $0,     #26
+//hidden size
+SLOAD   $1,     #93
+//output size
+SLOAD   $2,     #61
+//whh size
+SLOAD   $3,     #8649
+//wxh size
+SLOAD   $4,     #2418
+//why size
+SLOAD   $5,     #5673
+//input addr
+SLOAD   $6,     #0
+//hidden addr
+SLOAD   $7,     #26
+//output addr
+SLOAD   $8,     #119
+//bh addr
+SLOAD   $9,     #180
+//by addr
+SLOAD   $10,    #273
+//whh addr
+SLOAD   $11,    #0
+//wxh addr
+SLOAD   $12,    #8649
+//why addr
+SLOAD   $13,    #11067
+//wxh * xt
+SLOAD   $14,    #334
+
+VLOAD   $6,     $0,     #100
+VLOAD   $7,     $1,     #200
+VLOAD   $9,     $1,     #300
+VLOAD   $10,    $1,     #400
+MLOAD   $11,    $3,     #500
+MLOAD   $12,    $4,     #600
+MLOAD   $13,    $5,     #700
+
+MMV     $14,    $1,     $12,    $6,     $0
+VAV     $14,    $1,     $14,    $9
+MMV     $7,     $1,     $7,     $11,    $1
+VAV     $7,     $1,     $7,     $14
+VTANH   $7,     $1
+MMV     $8,     $2,     $7,     $13,    $2
+VAV     $8,     $2,     $8,     $10

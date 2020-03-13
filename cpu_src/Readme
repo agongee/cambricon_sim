@@ -1,0 +1,4 @@
+cd /intel/parallel_studio_xe_2020.0.088/compilers_and_libraries_2020/linux/bin\
+source compilervars.sh intel64
+source compilervars.sh ia32
+icc *.c -mkl -static-intel -o *

@@ -1,0 +1,140 @@
+// input(26) - H(93) - output(61)
+
+// input(26) - H(93)
+//input size
+SLOAD   $0,     #26
+//hidden size
+SLOAD   $1,     #93
+//output size
+SLOAD   $2,     #61
+//whh size
+SLOAD   $3,     #8649
+//wxh size
+SLOAD   $4,     #2418 
+//wxhf addr
+SLOAD   $5,     #0
+//whhf addr
+SLOAD   $6,     #2418
+//wxhi addr
+SLOAD   $7,     #11067
+//whhi addr
+SLOAD   $8,     #13485
+//wxho addr
+SLOAD   $9,     #22134
+//whho addr
+SLOAD   $10,    #24552
+//wxhg addr
+SLOAD   $11,    #33201
+//whhg addr
+SLOAD   $12,    #35619
+//bhf addr
+SLOAD   $13,    #0
+//bhi addr
+SLOAD   $14,    #93
+//bho addr
+SLOAD   $15,    #186
+//bhg addr
+SLOAD   $16,    #279
+//input addr
+SLOAD   $17,    #372
+//ft addr
+SLOAD   $18,    #465
+//it addr
+SLOAD   $19,    #558
+//ot addr
+SLOAD   $20,    #657
+//gt addr
+SLOAD   $21,    #744
+//ct addr
+SLOAD   $22,    #837
+//hidden addr
+SLOAD   $23,    #930
+
+//exp temp addr
+SLOAD   $24,    #1233
+//exp+1 temp addr
+SLOAD   $25,    #1326
+//temp addr
+SLOAD   $26,    #1419
+
+//wxhf 
+MLOAD   $5,     $4,     #100
+//whhf 
+MLOAD   $6,     $3,     #200
+//wxhi 
+MLOAD   $7,     $4,     #300
+//whhi 
+MLOAD   $8,     $3,     #400
+//wxho 
+MLOAD   $9,     $4,     #500
+//whho 
+MLOAD   $10,    $3,     #600
+//wxhg 
+MLOAD   $11,    $4,     #700
+//whhg 
+MLOAD   $12,    $3,     #800
+//bhf 
+VLOAD   $13,    $1,     #900
+//bhi 
+VLOAD   $14,    $1,     #1000
+//bho 
+VLOAD   $15,    $1,     #1100
+//bhg 
+VLOAD   $16,    $1,     #1200
+//input 
+VLOAD   $17,    $0,     #1300
+//ft 
+VLOAD   $18,    $1,     #1400
+//it 
+VLOAD   $19,    $1,     #1500
+//ot 
+VLOAD   $20,    $1,     #1600
+//gt 
+VLOAD   $21,    $1,     #1700
+//ct 
+VLOAD   $22,    $1,     #1800
+//hidden 
+VLOAD   $23,    $1,     #1900
+
+//ft
+MMV     $26,    $1,     $5,     $17,    $0
+MMV     $18,    $1,     $6,     $23,    $1
+VAV     $18,    $1,     $18,    $13
+VAV     $18,    $1,     $18,    $26
+VEXP    $24,    $1,     $18
+VAS     $25,    $1,     $24,    #1
+VDV     $18,    $1,     $24,    $25
+
+//it
+MMV     $26,    $1,     $7,     $17,    $0
+MMV     $19,    $1,     $8,     $23,    $1
+VAV     $19,    $1,     $19,    $14
+VAV     $19,    $1,     $19,    $26
+VEXP    $24,    $1,     $19
+VAS     $25,    $1,     $24,    #1
+VDV     $19,    $1,     $24,    $25
+
+//ot
+MMV     $26,    $1,     $9,     $17,    $0
+MMV     $20,    $1,     $10,    $23,    $1
+VAV     $20,    $1,     $20,    $15
+VAV     $20,    $1,     $20,    $26
+VEXP    $24,    $1,     $20
+VAS     $25,    $1,     $24,    #1
+VDV     $20,    $1,     $24,    $25
+
+//gt
+MMV     $26,    $1,     $11,    $17,    $0
+MMV     $21,    $1,     $12,    $23,    $1
+VAV     $21,    $1,     $21,    $15
+VAV     $21,    $1,     $21,    $26
+VTAHN   $21,    $1,     $21
+
+//ct
+VMUL    $26,    $1,     $19,    $21
+VMUL    $22,    $1,     $22,    $18
+VAV     $22,    $1,     $22,    $26
+
+//hidden(ht)
+VTAHN   $26,    $1,     $22
+VMUL    $22,    $1,     $22,    $26
