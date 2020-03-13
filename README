@@ -20,20 +20,3 @@ Check config/default.cfg as an example.
 
 [CPU Baseline]
 CPU baseline codes for MLP, CNN, RNN, LSTM are provided in cpu_src folder.
-
-
-
-Get Started with Intel® Parallel Studio XE 2020 Cluster Edition for Linux*
-file:///opt/intel/documentation_2020/en/ps2020/getstart_clus.htm
-
-
-mkl link line advisor
-file:///opt/intel/documentation_2020/en/mkl/common/mkl_link_line_advisor.htm
-https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor/
-
-mkl env variable init
-/opt/intel/mkl/bin$ source mklvars.sh intel64
-
-compile
-1. Set the INCLUDE, MKLROOT, LD_LIBRARY_PATH, LIBRARY_PATH, CPATH and NLSPATH environment variables in the command shell using one of mklvars script files in the 'bin' subdirectory of the Intel(R) MKL installation directory. Please see also the Intel(R) MKL User Guide.
-2. gcc -o (executable) (.c)  -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl

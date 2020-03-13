@@ -11,9 +11,16 @@ If you want to compile with Intel C/C++ Compiler, include this, too.
 
 To clear up the confusion, I recommend you to install Intel MKL in root. (Use sudo install_GUI.sh)
 
+You can get documentation about Intel Parallel Studio at file:///opt/intel/documentation_2020/en/ps2020/getstart_clus.htm
+
 2) MKL environment variable must be activated.
 > source /opt/intel/mkl/bin/mklvars.sh intel64
 
 (if, you didn't install in root option, source /home/${USER}/intel/mkl/bin/mklvars.sh intel64)
 
 3) Makefile
+
+[Compile Option]
+In case, you want to change compile option, use mkl link line advisor
+file:///opt/intel/documentation_2020/en/mkl/common/mkl_link_line_advisor.htm
+https://software.intel.com/en-us/articles/intel-mkl-link-line-advisor/
