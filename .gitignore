@@ -1,0 +1,12 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+mlp_mkl
+cnn_mkl
+rnn_mkl
+lstm_mkl
