@@ -1,0 +1,19 @@
+CPU Baseline
+
+[Prerequisite]
+1) Intel MKL must be installed.
+To install Intel MKL, you have to download Intel Parallel Studio.
+
+You can download from https://software.intel.com/en-us/parallel-studio-xe/choose-download.
+You don't have to install all the features in Intel Parallel Studio.
+The only thing you need is Intel MKL for C/C++.
+If you want to compile with Intel C/C++ Compiler, include this, too.
+
+To clear up the confusion, I recommend you to install Intel MKL in root. (Use sudo install_GUI.sh)
+
+2) MKL environment variable must be activated.
+> source /opt/intel/mkl/bin/mklvars.sh intel64
+
+(if, you didn't install in root option, source /home/${USER}/intel/mkl/bin/mklvars.sh intel64)
+
+3) Makefile

@@ -32,7 +32,7 @@ def delete_enter_comment(lines):
 
 # parse cmdline and return cfg, src file path
 def cmd_parse():
-    parser = argparse.ArgumentParser(description='Simulation Arguments')
+    parser = argparse.ArgumentParser(description='Cambricon ISA Timing Simulator')
     
     parser.add_argument('--cfg', required=False, \
         help='microarchitecture and latency config file')
@@ -96,6 +96,9 @@ if __name__ == '__main__':
     # commits = [0] * len(insts) # instruction commit 
     cycle = 0 # total cycle
     pc = 0 # pc, program counter
+    data_transfer = 0
+    matrix_compute = 0
+    vector_compute = 0
     
     next_scalar_agu = [] # next to_scalar_agu
     to_scalar_agu = [] # reg -> scalar func unit and agu
@@ -108,7 +111,9 @@ if __name__ == '__main__':
     val_scalar = [] # scalar value to write back
     reg_scalar = [] # scalar register to write back on
     
-    print(f'Simulation Begin: {src}, {len(insts)}')
+    print(f'  Cambricon ISA Simulation')
+    print(f'  Source file: {src}')
+    print(f'  Source length: {len(insts)}\n')
     
     # src instruction simulation
     while True:
@@ -198,13 +203,31 @@ if __name__ == '__main__':
 
         # if pc >= len(insts):
         c_l = cache.left 
-        v_l = vectorfunc.left 
-        ma_l = matrixfunc.left
+        v_l, v_t = vectorfunc.left_cycle()
+        ma_l, ma_t = matrixfunc.left_cycle()
         i_l = issuequeue.left()
         me_l = memoryqueue.left()
         d_l = decoder.left() 
         f_l = fetcher.left()
         r_l = reg.left()
+
+        transfer_counted = False
+
+        if c_l > 0:
+            data_transfer += 1
+            transfer_counted = True
+        
+        if v_t and not transfer_counted:
+            data_transfer += 1
+            transfer_counted = True
+        elif not v_t:
+            vector_compute += 1
+
+        if ma_t and not transfer_counted:
+            data_transfer += 1
+            transfer_counted = True
+        elif ma_t:
+            matrix_compute += 1
 
         # print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
 
@@ -216,5 +239,13 @@ if __name__ == '__main__':
         
         
         cycle += 1
-
-    print(f'{src} computation cycle: {cycle}')
+    
+    data_ratio = round(data_transfer/cycle*100, 2)
+    matrix_ratio = round(matrix_compute/cycle*100, 2)
+    vector_ratio = round(vector_compute/cycle*100, 2)
+    
+    print('  == Simulation Complete ==')
+    print(f'  Computation cycle:\t\t{cycle}')
+    print(f'  Data transfer cycle:\t\t{data_transfer}, {data_ratio}%')
+    print(f'  Matrix computation cycle:\t{matrix_compute}, {matrix_ratio}%')
+    print(f'  Vector computation cycle:\t{vector_compute}, {vector_ratio}%')

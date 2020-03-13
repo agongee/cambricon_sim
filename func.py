@@ -41,6 +41,7 @@ class VectorFunc:
         self.d_cycle = d_cycle
         self.width = width
         self.left = 0
+        self.trans = True
 
     def request(self, inst):
         if self.left == 1:
@@ -57,15 +58,17 @@ class VectorFunc:
             size = int(inst[2])
             s_w = size / self.width * 32
             self.left = int(s_w * self.d_cycle)
+            self.trans = True
             return False
         else: # computation 
             size = int(inst[2])
             s_n = size / self.num
             self.left = int(s_n * self.c_cycle)
+            self.trans = False
             return False
     
     def left_cycle(self):
-        return self.left
+        return self.left, self.trans
 
 
 
@@ -76,6 +79,7 @@ class MatrixFunc:
         self.d_cycle = d_cycle
         self.width = width
         self.left = 0
+        self.trans = True
 
     def request(self, inst):
         # print("MATRIX ", inst)
@@ -93,12 +97,14 @@ class MatrixFunc:
             size = int(inst[2])
             s_w = size / self.width * 32
             self.left = int(s_w * self.d_cycle)
+            self.trans = True
             return False
         else: # computation 
             size = int(inst[2])
             s_n = size / self.num
             self.left = int(s_n * self.c_cycle)
+            self.trans = False
             return False
 
     def left_cycle(self):
-        return self.left
+        return self.left, self.trans

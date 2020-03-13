@@ -1,3 +1,28 @@
+Cambricon ISA Timing Simulator
+
+[Prerequisite Python Library]
+There is no extra library to install in case you are already using python.
+If there is ImportError, check the libraries written below.
+
+- re
+- configparser
+- argparser
+
+[Usage]
+python simul.py --src {cambricon instruction source file} --cfg {accelerator configuration file}
+
+[Source File]
+Cambricon instruction source files which implements MLP, CNN, RNN, LSTM respectively are provided in src folder
+
+[Config]
+The parameters which are not provided from the paper can be set by configuration file.
+Check config/default.cfg as an example.
+
+[CPU Baseline]
+CPU baseline codes for MLP, CNN, RNN, LSTM are provided in cpu_src folder.
+
+
+
 Get Started with Intel® Parallel Studio XE 2020 Cluster Edition for Linux*
 file:///opt/intel/documentation_2020/en/ps2020/getstart_clus.htm
 
@@ -12,10 +37,3 @@ mkl env variable init
 compile
 1. Set the INCLUDE, MKLROOT, LD_LIBRARY_PATH, LIBRARY_PATH, CPATH and NLSPATH environment variables in the command shell using one of mklvars script files in the 'bin' subdirectory of the Intel(R) MKL installation directory. Please see also the Intel(R) MKL User Guide.
 2. gcc -o (executable) (.c)  -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
-
-
-
-VTune Amplifier user mode collection may fail to run on Ubuntu* (200197563)
-VTune Amplifier may fail to collect data for Hotspots and Threading analysis types on the Ubuntu operating system. Once a collection is started, the message appears in the output: "Failed to start profiling because the scope of ptrace() system call application is limited. To enable profiling, please set /proc/sys/kernel/yama/ptrace_scope to 0. See the Release Notes for instructions on enabling it permanently."
-To workaround this problem for the current session, set contents of the /proc/sys/kernel/yama/ptrace_scope sysctl file to 0.
-To make this change permanent, set kernel.yama.ptrace_scope value to 0 at /etc/sysctl.d/10-ptrace.conf file using root permissions and reboot the machine.
