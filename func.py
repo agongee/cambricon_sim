@@ -54,7 +54,7 @@ class VectorFunc:
         elif self.left != 0:
             self.left -= 1
             return False
-        elif inst[0][1:] == 'LOAD' or inst[0][1:] == 'STORE':
+        elif inst[0] == 'VLOAD' or inst[0][1:] == 'VSTORE':
             size = int(inst[2])
             s_w = size / self.width * 32
             self.left = int(s_w * self.d_cycle)
@@ -93,13 +93,13 @@ class MatrixFunc:
         elif self.left != 0:
             self.left -= 1
             return False
-        elif inst[0][1:] == 'LOAD' or inst[0][1:] == 'STORE':
+        elif inst[0] == 'MLOAD' or inst[0] == 'MSTORE':
             size = int(inst[2])
             s_w = size / self.width * 32
             self.left = int(s_w * self.d_cycle)
             self.trans = True
             return False
-        else: # computation 
+        else: # computation
             size = int(inst[2])
             s_n = size / self.num
             self.left = int(s_n * self.c_cycle)

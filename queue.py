@@ -122,13 +122,13 @@ class MemoryQueue:
 
         # print(f"DEQUEUE, {c_cycle}, {v_cycle}, {m_cycle}")
 
-        if check_scalar_func(temp_inst) and c_cycle <= 1:
+        if check_scalar_func(temp_inst) and c_cycle == 0:
             to_cache = deepcopy(temp_inst)
             self.inst_queue.pop(0)
-        elif check_vector_func(temp_inst) and v_cycle <= 1:
+        elif check_vector_func(temp_inst) and v_cycle == 0:
             to_vector = deepcopy(temp_inst)
             self.inst_queue.pop(0)
-        elif check_matrix_func(temp_inst) and m_cycle <= 1:
+        elif check_matrix_func(temp_inst) and m_cycle == 0:
             to_matrix = deepcopy(temp_inst)
             self.inst_queue.pop(0)
        

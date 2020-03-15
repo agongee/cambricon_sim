@@ -71,10 +71,10 @@ if __name__ == '__main__':
         cache_size = 32
 
         vector_compute_cycle = 2
-        vector_data_cycle = 10
+        vector_data_cycle = 4
 
         matrix_compute_cycle = 4
-        matrix_data_cycle = 10
+        matrix_data_cycle = 4
     
     # microarch setup
     fetcher = Fetcher()
@@ -217,16 +217,16 @@ if __name__ == '__main__':
             data_transfer += 1
             transfer_counted = True
         
-        if v_t and not transfer_counted:
+        if v_t and not transfer_counted and v_l > 0:
             data_transfer += 1
             transfer_counted = True
-        elif not v_t:
+        elif not v_t and v_l > 0:
             vector_compute += 1
 
-        if ma_t and not transfer_counted:
+        if ma_t and not transfer_counted and ma_l > 0:
             data_transfer += 1
             transfer_counted = True
-        elif ma_t:
+        elif not ma_t and ma_l > 0:
             matrix_compute += 1
 
         # print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
