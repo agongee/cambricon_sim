@@ -1,0 +1,89 @@
+// input(320) - H1(200) - H2(100) - H3(50) - Output(10)
+
+// input(320) - H1(200)
+SLOAD   $0,     #320 
+SLOAD   $1,     #200
+SLOAD   $2,     #64000
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #320
+SLOAD   $6,     #470
+SLOAD   $7,     #620
+SLOAD   $8,     #770
+SLOAD   $9,     #920
+SLOAD   $10,    #1070
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200
+
+// H1(200) - H2(100)
+SLOAD   $0,     #200 
+SLOAD   $1,     #100
+SLOAD   $2,     #20000
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #200
+SLOAD   $6,     #300
+SLOAD   $7,     #400
+SLOAD   $8,     #500
+SLOAD   $9,     #600
+SLOAD   $10,    #700
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200
+
+//H2(100) - H3(50)
+SLOAD   $0,     #100
+SLOAD   $1,     #50
+SLOAD   $2,     #5000
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #100
+SLOAD   $6,     #150
+SLOAD   $7,     #200
+SLOAD   $8,     #250
+SLOAD   $9,     #300
+SLOAD   $10,    #350
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200
+
+//H3(50) - Output(10)
+SLOAD   $0,     #50
+SLOAD   $1,     #10
+SLOAD   $2,     #500
+SLOAD   $3,     #0
+SLOAD   $4,     #0
+SLOAD   $5,     #50
+SLOAD   $6,     #60
+SLOAD   $7,     #70
+SLOAD   $8,     #80
+SLOAD   $9,     #90
+SLOAD   $10,    #100
+
+VLOAD   $3, $0, #100
+MLOAD   $4, $2, #300
+MMV     $7, $1, $4, $3, $0
+VAV     $8, $1, $7, $5
+VEXP    $9, $1, $8
+VAS     $10,    $1, $9, #1
+VDV     $6, $1, $9, $10
+VSTORE  $6, $1, #200

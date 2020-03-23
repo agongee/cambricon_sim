@@ -1,0 +1,65 @@
+//input(64) - neuron(36)
+
+// input size
+SLOAD   $0,     #64
+// weight size
+SLOAD   $1,     #2304
+// input addr (vector)
+SLOAD   $2,     #0
+// weight addr (vector)
+SLOAD   $3,     #64
+// neuron size + 1
+SLOAD   $4,     #37
+// neuron temp addr
+SLOAD   $5,     #2368
+
+
+
+// input load
+VLOAD   $0,     #100
+// weight load
+VLOAD   $1,     #200
+
+
+// loop, $6 is counter, $7 is weight addr
+SLOAD   $6,     $4
+SLOAD   $7,     $3
+
+// First trial
+// counter -=1, weight addr += 64
+SADD    $6,     $6,     #-1
+SADD    $7,     $0,     $7
+
+// distance count
+VSV     $5,     $7,     $2
+VDP     $8,     $5,     $5
+
+// $8 = temp dist, $9 = min dist, $10 = min dist weight addr
+SMOVE   $9,     $8
+SMOVE   $10,    $7
+
+// Left trials, 35 left
+// counter -=1, weight addr += 64
+SADD    $6,     $6,     #-1
+SADD    $7,     $0,     $7
+
+// distance count
+VSV     $5,     $7,     $2
+VDP     $8,     $5,     $5
+
+// if original is smaller
+SGT     $11,    $8,     $9
+
+// jump (skip updating)
+CB      #2,     $11  
+SMOVE   $9,     $8
+SMOVE   $10,    $7
+
+// while loop
+CB      #-9,     $6
+
+// update weight
+VSV     $5,     $2,     $10
+VDS     $5,     $5,     #2
+VAV     $10,    $10,    $5
+

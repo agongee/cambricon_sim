@@ -35,7 +35,7 @@ class ScalarFunc:
         return temp_v, temp_r
 
 class VectorFunc:
-    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512):
+    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=32):
         self.num = num
         self.c_cycle = c_cycle
         self.d_cycle = d_cycle
@@ -56,7 +56,7 @@ class VectorFunc:
             return False
         elif inst[0] == 'VLOAD' or inst[0][1:] == 'VSTORE':
             size = int(inst[2])
-            s_w = size / self.width * 32
+            s_w = size / self.width 
             self.left = int(s_w * self.d_cycle)
             self.trans = True
             return False
@@ -73,7 +73,7 @@ class VectorFunc:
 
 
 class MatrixFunc:
-    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=512):
+    def __init__(self, num=32, c_cycle=1, d_cycle=1, width=32):
         self.num = num
         self.c_cycle = c_cycle
         self.d_cycle = d_cycle
@@ -95,7 +95,7 @@ class MatrixFunc:
             return False
         elif inst[0] == 'MLOAD' or inst[0] == 'MSTORE':
             size = int(inst[2])
-            s_w = size / self.width * 32
+            s_w = size / self.width
             self.left = int(s_w * self.d_cycle)
             self.trans = True
             return False

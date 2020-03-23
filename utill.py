@@ -10,17 +10,11 @@ def compute(type, operands):
         return ~operands[1], operands[0]
     
     # compare
-    elif type == 'SLT':
-        return operands[1] < operands[2], operands[0]
-
-    elif type == 'SLEQ':
-        return operands[1] <= operands[2], operands[0]
-
     elif type == 'SGT':
-        return operands[1] > operands[2], operands[0]
+        return int(operands[1] > operands[2]), operands[0]
 
     elif type == 'SGEQ':
-        return operands[1] >= operands[2], operands[0]
+        return int(operands[1] >= operands[2]), operands[0]
 
     # arithmetic
     elif type == 'SADD':
