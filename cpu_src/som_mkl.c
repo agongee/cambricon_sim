@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <mkl.h>
 
@@ -16,7 +17,7 @@ uint64_t rdtsc(){
 
 int main(){
     float *in, *temp; // input
-    float *weight, *temp_weight; // weight
+    float *weight, *temp_weight, *to_update_weight; // weight
     float *update;
     int in_dim, w_dim;
     int min_dist;
@@ -69,12 +70,12 @@ int main(){
             temp_dist = cblas_snrm2(in_dim, temp, 1);
             if(dist > temp_dist){
                 dist = temp_dist;
-                temp = weight
+                to_update_weight = temp_weight;
             }
             temp_weight += in_dim;
         }
         
-        vsMul(in_dim, temp_weight, update, temp_weight);
+        vsMul(in_dim, to_update_weight, update, to_update_weight);
         
     }
     c_elapsed = (rdtsc() - c_initial) / LOOP;

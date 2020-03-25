@@ -2,6 +2,8 @@ import re
 
 from copy import deepcopy
 
+from util import Inst
+
 
 class Decoder:
     def __init__(self):
@@ -12,7 +14,10 @@ class Decoder:
     def recv(self, inst):
         if len(inst) != 0:
             self.to_decode = deepcopy(inst)
-            #print("DECODE ", self.to_decode)
+            '''
+            for i in self.to_decode:
+                print("DECODE: ", i)
+            '''
         else:
             self.to_decode = []
 
@@ -34,13 +39,17 @@ class Decoder:
 
         for i in self.to_decode:
             # temp_decoded.append(re.split(pattern, i))
-            self.decoded.append(re.split(pattern, i))
+            self.decoded.append(Inst(re.split(pattern, i.inst), i.pc, True))
             
         self.to_decode = []
             
 
     def to_issuequeue(self):
         temp = deepcopy(self.to_pass)
+        '''
+        for i in temp:
+            print("TO_ISSUEQUEUE: ", i)
+        '''
         self.to_pass = []
         return temp
 

@@ -1,5 +1,7 @@
 from copy import deepcopy
 
+from util import Inst
+
 class Fetcher:
     def __init__(self, width=2):
         self.width = width
@@ -13,10 +15,12 @@ class Fetcher:
             block = False
             for i in range(pc, pc+self.width):
                 temp += 1
+                temp_inst = Inst(lines[i], i)
+                self.to_fetch.append(temp_inst)
                 if lines[i][0:4] == 'JUMP' or lines[i][0:2] == 'CB':
                     block = True
                     break
-            self.to_fetch = deepcopy(lines[pc:pc+temp])
+            # self.to_fetch = deepcopy(lines[pc:pc+temp])
             return pc + temp, block
         elif pc >= len(lines):
             self.to_fetch = []
@@ -26,10 +30,12 @@ class Fetcher:
             block = False
             for i in range(pc, len(lines)):
                 temp += 1
+                temp_inst = Inst(lines[i], i)
+                self.to_fetch.append(temp_inst)
                 if lines[i][0:4] == 'JUMP' or lines[i][0:2] == 'CB':
                     block = True
                     break
-            self.to_fetch = deepcopy(lines[pc:pc+temp])
+            # self.to_fetch = deepcopy(lines[pc:pc+temp])
             return pc+temp, block
 
     def send(self):

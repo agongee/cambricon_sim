@@ -18,11 +18,18 @@ int main(){
     float *in, *h1, *h2, *out; // activations
     float *h1_exp, *h2_exp, *out_exp; // exponentioal, sigmoid
     float *in_h1, *h1_h2, *h2_out; // weights
-    float *h1_b, *h2_b, *out_b; // bias
+    float *one; // vector of one
     int in_dim, h1_dim, h2_dim, out_dim; // dimensions
     int loop, i, k;
     double s_initial, s_elapsed;
     uint64_t c_initial, c_elapsed, c_t_initial, c_t_elapsed;
+
+    char enter = 0;
+
+    printf(" MLP CPU Benchmark Computation!\n");
+    printf(" CPU Allocation must be Processed!\n");
+    printf(" Press Enter to Continue!\n");
+    while (enter != '\r' && enter != '\n') { enter = getchar(); }
 
     c_t_initial = rdtsc();
 
@@ -31,6 +38,11 @@ int main(){
     h2_dim = 150;
     out_dim = 14;
     k = 1;
+
+    one = (float *)mkl_malloc(h1_dim*sizeof(float), 32);
+    for(i = 0; i < h1_dim; i++){
+        one[i] = 1;
+    }
 
     in = (float *)mkl_malloc(in_dim*sizeof(float), 32);
     h1 = (float *)mkl_malloc(h1_dim*sizeof(float), 32);
@@ -44,12 +56,6 @@ int main(){
     h1_exp = (float *)mkl_malloc(h1_dim*sizeof(float), 32);
     h2_exp = (float *)mkl_malloc(h2_dim*sizeof(float), 32);
     out_exp = (float *)mkl_malloc(out_dim*sizeof(float), 32);
-
-    /*
-    h1_b = (float *)mkl_malloc(h1_dim*sizeof(float), 32);
-    h2_b = (float *)mkl_malloc(h2_dim*sizeof(float), 32);
-    out_b = (float *)mkl_malloc(out_dim*sizeof(float), 32);
-    */
 
     printf(" Initializing Input and Weight Data\n\n");
     s_initial = dsecnd();
@@ -70,17 +76,6 @@ int main(){
         h2_out[i] = (float)(i+4);
     }
 
-    for(i = 0; i < h1_dim; i++){
-        h1[i] = (float)(i+5);
-    }
-
-    for(i = 0; i < h2_dim; i++){
-        h2[i] = (float)(i+6);
-    }
-
-    for(i = 0; i < out_dim; i++){
-        out[i] = (float)(i+7);
-    }
     c_elapsed = rdtsc() - c_initial;
     s_elapsed = dsecnd() - s_initial;
     printf (" == Data initialization using Intel(R) MKL completed == \n"
@@ -110,27 +105,21 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, h1_dim, in_dim, 1, in, in_dim, in_h1, h1_dim, 1, h1, h1_dim);
         vsExp(h1_dim, h1, h1_exp);
-        for(i = 0; i < h1_dim; i++){
-            h1[i] = h1_exp[i] + 1;
-        }
+        vsAdd(h1_dim, h1_exp, one, h1);
         vsDiv(h1_dim, h1, h1_exp, h1);
         
         // h1 - h2
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, h2_dim, h1_dim, 1, h1, h1_dim, h1_h2, h2_dim, 1, h2, h2_dim);
         vsExp(h2_dim, h2, h2_exp);
-        for(i = 0; i < h2_dim; i++){
-            h2[i] = h2_exp[i] + 1;
-        }
+        vsAdd(h2_dim, h2_exp, one, h2);
         vsDiv(h2_dim, h2, h2_exp, h2);
 
         // h2 - out
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, out_dim, h2_dim, 1, h2, h2_dim, h2_out, out_dim, 1, out, out_dim);
         vsExp(out_dim, out, out_exp);
-        for(i = 0; i < out_dim; i++){
-            out[i] = out_exp[i] + 1;
-        }
+        vsAdd(out_dim, out_exp, one, out);
         vsDiv(out_dim, out, out_exp, out);
 
     }

@@ -8,7 +8,7 @@ from decoder import Decoder
 from queue import IssueQueue, MemoryQueue
 from reg import Reg
 from func import ScalarFunc, VectorFunc, MatrixFunc
-from utill import check_scalar_func, check_control_func, check_transfer
+from util import check_scalar_func, check_control_func, check_transfer, check_matrix_func, check_vector_func, Inst
 from cache import Cache
 
 def debug(txt):
@@ -117,7 +117,10 @@ if __name__ == '__main__':
     
     # src instruction simulation
     while True:
-        #if pc % 20 == 0:
+        '''
+        if pc > 58 and cycle % 100 == 0:
+            input(f"cycle={cycle}, full={issuequeue.full()}, block={branch_block}, pc = {pc}")
+        '''
         #debug(f'CYCLE:{cycle}, PC:{pc}')
 
         # if issue queue is not full, i.e. can fetch and decode
@@ -125,8 +128,10 @@ if __name__ == '__main__':
             # fetch
             fetcher.send()
             pc, branch_block = fetcher.get(pc, insts)
-            #if branch_block:
-                #print("BRANCH BLOCKED!")
+            '''
+            if branch_block:
+                print(f"BRANCH BLOCKED! at {pc}")
+            '''
         else:
             fetcher.send()
            
@@ -149,21 +154,26 @@ if __name__ == '__main__':
 
         for i in to_reg:
             # print("DEBUG: ", i)
-            if check_scalar_func(i) and i[1][0] == '$':
-                reg_num = int(i[1][1:])
-                i[1] = reg_num
-                for j in range(2, len(i)):
+            if check_scalar_func(i.inst) and i.inst[1][0] == '$':
+                reg_num = int(i.inst[1][1:])
+                i.inst[1] = reg_num
+                for j in range(2, len(i.inst)):
                     # print("DEBUG!!: ", i[j])
-                    if len(i[j]) != 0:
-                        i[j] = reg.get(i[j])
-                if i[0] != 'SSTORE':
+                    if len(i.inst[j]) != 0:
+                        i.inst[j] = reg.get(i.inst[j])
+                if i.inst[0] != 'SSTORE':
                     # print("DEBUG: ", i)
                     reg.will_wb(reg_num)
 
             else:
-                for j in range(1, len(i)):
-                    if len(i[j]) != 0:
-                        i[j] = reg.get(i[j])
+                reg_num = int(i.inst[1][1:])
+                for j in range(1, len(i.inst)):
+                    if len(i.inst[j]) != 0:
+                        i.inst[j] = reg.get(i.inst[j])
+                if check_vector_func(i.inst) and i.inst[0] != 'VSTORE':
+                    reg.will_wb(reg_num)
+                elif check_matrix_func(i.inst) and i.inst[0] != 'MSTORE':
+                    reg.will_wb(reg_num)             
                         
         next_scalar_agu = deepcopy(to_reg)
         
@@ -178,18 +188,18 @@ if __name__ == '__main__':
 
         for i in to_scalar_agu:
             #print("TO_SCALAR_AGU ", i)
-            if check_scalar_func(i) and i[0] != 'SSTORE':
+            if check_scalar_func(i.inst) and i.inst[0] != 'SSTORE':
                 #print("SCALAR: ", i)
-                scalarfunc.compute(i)
-            elif check_control_func(i):
-                #print("CONTROL: ", i)
+                scalarfunc.compute(i.inst)
+            elif check_control_func(i.inst):
+                # print("CONTROL: ", i)
                 branch_block = False
-                if i[0] == 'JUMP':  # branch
-                    pc += i[1]      
-                elif i[2] > 0:     # control branch
-                    pc += i[1]
+                if i.inst[0] == 'JUMP':  # branch
+                    pc += i.inst[1]      
+                elif i.inst[2] > 0:     # control branch
+                    pc += i.inst[1]
                     #print(f'CB!!! i = {i[2]}, pc = {pc}')
-            elif i[0] == 'NOP':
+            elif i.inst[0] == 'NOP':
                 pass
             else:
                 memoryqueue.enqueue(i)             
@@ -203,13 +213,16 @@ if __name__ == '__main__':
 
         # if pc >= len(insts):
         c_l = cache.left 
-        v_l, v_t = vectorfunc.left_cycle()
-        ma_l, ma_t = matrixfunc.left_cycle()
+        v_l, v_t, v_w = vectorfunc.left_cycle()
+        ma_l, ma_t, ma_w = matrixfunc.left_cycle()
         i_l = issuequeue.left()
         me_l = memoryqueue.left()
         d_l = decoder.left() 
         f_l = fetcher.left()
         r_l = reg.left()
+
+        reg.writeback(None, v_w)
+        reg.writeback(None, ma_w)
 
         transfer_counted = False
 

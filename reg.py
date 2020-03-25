@@ -1,4 +1,3 @@
-
 class Reg:
     def __init__(self, num=64):
         self.reg_num = num
@@ -9,7 +8,7 @@ class Reg:
         if param[0] == '$':
             index = int(param[1:])
             if self.to_wb[index] == 1:
-                #print("BLOCKED! ", index)
+                print("BLOCKED! ", index)
                 return param
             return self.reg_file[index]
         elif param[0] == '#':
@@ -18,12 +17,22 @@ class Reg:
             return param
     
     def will_wb(self, index):
+        #print("WILL --> ", index)
         self.to_wb[index] = 1
 
     def check_wb(self, index):
         return self.to_wb[index]
 
     def writeback(self, value, index):
+
+        if value == None and isinstance(index, int):
+            if index == -1:
+                return
+            else:
+                #print(f'WRITEBACK --> {index}')
+                self.to_wb[index] = 0
+                return
+
         if len(value) != len(index) or len(value) == 0:
             return
         
@@ -34,6 +43,7 @@ class Reg:
             temp_index = index[i]
             #print("WB ", temp_value, temp_index)
             if self.to_wb[temp_index] == 1:
+                #print(f'WRITEBACK --> {temp_index}')
                 self.to_wb[temp_index] = 0
                 self.reg_file[temp_index] = temp_value
 

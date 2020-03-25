@@ -1,7 +1,7 @@
 from copy import deepcopy
 
-from utill import compute as COMPUTE
-from utill import check_scalar_func
+from util import compute as COMPUTE
+from util import check_scalar_func
 
 class ScalarFunc:
     def __init__(self):
@@ -42,33 +42,54 @@ class VectorFunc:
         self.width = width
         self.left = 0
         self.trans = True
+        self.wb = -1
+        self.temp_wb = []
 
-    def request(self, inst):
+    def request(self, inst_class):
+        inst = None
+        if inst_class != None:
+            inst = inst_class.inst
         if self.left == 1:
             self.left = 0
+            if len(self.temp_wb) > 0:
+                self.wb = self.temp_wb.pop(0)
+                #print("VVV LET'S GO --> ", self.wb)
+            else:
+                self.wb = -1
             return True
         if inst == None or inst == []:
             if self.left != 0:
                 self.left -= 1
+            self.wb = -1
             return False
         elif self.left != 0:
             self.left -= 1
+            self.wb = -1
             return False
         elif inst[0] == 'VLOAD' or inst[0][1:] == 'VSTORE':
             size = int(inst[2])
             s_w = size / self.width 
-            self.left = int(s_w * self.d_cycle)
+            self.left = max(1, int(s_w * self.d_cycle))
             self.trans = True
+            if inst[0] == 'VLOAD':
+                temp_index = int(inst_class.org_inst[1][1:])
+                self.temp_wb.append(temp_index)
+                #print("VVV DEBUG --> ", temp_index)
+            self.wb = -1
             return False
         else: # computation 
             size = int(inst[2])
             s_n = size / self.num
-            self.left = int(s_n * self.c_cycle)
+            self.left = max(int(s_n * self.c_cycle), 1)
             self.trans = False
+            temp_index = int(inst_class.org_inst[1][1:])
+            self.temp_wb.append(temp_index)
+            #print("VVV DEBUG --> ", temp_index, " ", self.left)
+            self.wb = -1
             return False
     
     def left_cycle(self):
-        return self.left, self.trans
+        return self.left, self.trans, self.wb
 
 
 
@@ -80,31 +101,53 @@ class MatrixFunc:
         self.width = width
         self.left = 0
         self.trans = True
+        self.wb = -1
+        self.temp_wb = []
 
-    def request(self, inst):
+    def request(self, inst_class):
+        inst = None
+        if inst_class != None:
+            inst = inst_class.inst
         # print("MATRIX ", inst)
         if self.left == 1:
             self.left = 0
+            if len(self.temp_wb) > 0:
+                self.wb = self.temp_wb.pop(0)
+                #print("MMM LET'S GO --> ", self.wb)
+            else:
+                self.wb = -1
             return True
         if inst == None or inst == []:
             if self.left != 0:
                 self.left -= 1
+            self.wb = -1
             return False     
         elif self.left != 0:
             self.left -= 1
+            self.wb = -1
             return False
         elif inst[0] == 'MLOAD' or inst[0] == 'MSTORE':
             size = int(inst[2])
             s_w = size / self.width
-            self.left = int(s_w * self.d_cycle)
+            self.left = max( 1, int(s_w * self.d_cycle))
             self.trans = True
+            if inst[0] == 'MLOAD':
+                temp_index = int(inst_class.org_inst[1][1:])
+                self.temp_wb.append(temp_index)
+                #print("MMM DEBUG --> ", temp_index)
+            self.wb = -1
+            #print(f"Matrix Data Inst: {inst}, Cycle: {self.left}")
             return False
         else: # computation
             size = int(inst[2])
             s_n = size / self.num
-            self.left = int(s_n * self.c_cycle)
+            self.left = max(1, int(s_n * self.c_cycle))
             self.trans = False
+            temp_index = int(inst_class.org_inst[1][1:])
+            self.temp_wb.append(temp_index)
+            #print("MMM DEBUG --> ", temp_index)
+            self.wb = -1
             return False
 
     def left_cycle(self):
-        return self.left, self.trans
+        return self.left, self.trans, self.wb
