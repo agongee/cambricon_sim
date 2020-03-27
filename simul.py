@@ -99,6 +99,7 @@ if __name__ == '__main__':
     data_transfer = 0
     matrix_compute = 0
     vector_compute = 0
+    branch_cycle = 0
     
     next_scalar_agu = [] # next to_scalar_agu
     to_scalar_agu = [] # reg -> scalar func unit and agu
@@ -242,6 +243,9 @@ if __name__ == '__main__':
         elif not ma_t and ma_l > 0:
             matrix_compute += 1
 
+        if branch_block:
+            branch_cycle += 1
+
         # print(f'CACHE:{c_l}, VECTOR:{v_l}, MATRIX:{ma_l}, ISSUE:{i_l}, MEMORY:{me_l}, DECODER:{d_l}, FETCHER:{f_l}, REG:{r_l}')
 
         left = c_l + v_l + ma_l + i_l + me_l  + d_l + f_l + r_l
@@ -256,9 +260,11 @@ if __name__ == '__main__':
     data_ratio = round(data_transfer/cycle*100, 2)
     matrix_ratio = round(matrix_compute/cycle*100, 2)
     vector_ratio = round(vector_compute/cycle*100, 2)
+    branch_ratio = round(branch_cycle/cycle*100, 2)
     
     print('  == Simulation Complete ==')
     print(f'  Computation cycle:\t\t{cycle}')
     print(f'  Data transfer cycle:\t\t{data_transfer}, {data_ratio}%')
     print(f'  Matrix computation cycle:\t{matrix_compute}, {matrix_ratio}%')
     print(f'  Vector computation cycle:\t{vector_compute}, {vector_ratio}%')
+    print(f'  Branch fetch stall cycle:\t{branch_cycle}, {branch_ratio}%')

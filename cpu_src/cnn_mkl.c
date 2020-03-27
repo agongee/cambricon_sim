@@ -18,6 +18,7 @@ int main(){
     float *in_col, *s1_col, *s2_col;
     float *c1_exp, *c2_exp, *f1_exp, *f2_exp, *out_exp; // exponential, sigmoid
     float *f1_b, *f2_b, *out_b; // bias
+    float *one;
     int in_dim, c1_dim, s1_dim, s1_re_dim, c2_dim, s2_dim, f1_dim, f2_dim, out_dim; 
     int in_c1_dim, s1_c2_dim, s2_f1_dim, f1_f2_dim, f2_out_dim;
     int loop, i, j;
@@ -41,6 +42,11 @@ int main(){
     s2_f1_dim = 400*120;
     f1_f2_dim = 120*84;
     f2_out_dim = 84*10;
+
+    one = (float *)mkl_malloc(c1_dim*sizeof(float), 32);
+    for(i = 0; i < c1_dim; i++){
+        one[i] = 1;
+    }
     
     in = (float *)mkl_malloc(in_dim*sizeof(float), 32);
     c1 = (float *)mkl_malloc(c1_dim*sizeof(float), 32);
@@ -107,9 +113,7 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     6, 28*28, 5*5, 1, in_c1, 5*5, in, 28*28, 0, c1, 28*28);
         vsExp(c1_dim, c1, c1_exp);
-        for(i = 0; i < c1_dim; i++){
-            c1[i] = c1_exp[i] + 1;
-        }
+        vsAdd(c1_dim, c1_exp, one, c1);
         vsDiv(c1_dim, c1, c1_exp, c1);
 
         // c1 -> s1
@@ -150,9 +154,7 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     16, 10*10, 5*5*6, 1, s1_c2, 5*5*6, s1_re, 10*10, 0, c2, 10*10);
         vsExp(c2_dim, c2, c2_exp);
-        for(i = 0; i < c2_dim; i++){
-            c2[i] = c2_exp[i] + 1;
-        }
+        vsAdd(c2_dim, c2_exp, one, c2);
         vsDiv(c2_dim, c2, c2_exp, c2);
 
         // c2 -> s2
@@ -193,9 +195,7 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, f1_dim, s2_dim, 1, s2, s2_dim, s2_f1, f1_dim, 1, f1, f1_dim);
         vsExp(f1_dim, f1, f1_exp);
-        for(i = 0; i < f1_dim; i++){
-            f1[i] = f1_exp[i] + 1;
-        }
+        vsAdd(f1_dim, f1_exp, one, f1);
         vsDiv(f1_dim, f1, f1_exp, f1);
 
 
@@ -203,9 +203,7 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, f2_dim, f1_dim, 1, f1, f1_dim, f1_f2, f2_dim, 1, f2, f2_dim);
         vsExp(f2_dim, f2, f2_exp);
-        for(i = 0; i < f2_dim; i++){
-            f2[i] = f2_exp[i] + 1;
-        }
+        vsAdd(f2_dim, f2_exp, one, f2);
         vsDiv(f2_dim, f2, f2_exp, f2);
 
 
@@ -213,9 +211,7 @@ int main(){
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, out_dim, f2_dim, 1, f2, f2_dim, f2_out, out_dim, 1, out, out_dim);
         vsExp(out_dim, out, out_exp);
-        for(i = 0; i < out_dim; i++){
-            out[i] = out_exp[i] + 1;
-        }
+        vsAdd(out_dim, out_exp, one, out);
         vsDiv(out_dim, out, out_exp, out);
 
 

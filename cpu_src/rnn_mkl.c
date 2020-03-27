@@ -75,6 +75,7 @@ int main(){
 
         vsAdd(h_dim, h1, ht, h1);
         vsAdd(h_dim, h1, bh, h1);
+        vsTanh(h_dim, h1, h1);
 
         cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
                     1, out_dim, h_dim, 1, h1, h_dim, w_hy, out_dim, 0, out, out_dim);

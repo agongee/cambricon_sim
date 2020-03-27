@@ -6,7 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
-mlp_mkl
-cnn_mkl
-rnn_mkl
-lstm_mkl
+*.json
+*.pyc
+
+*_mkl

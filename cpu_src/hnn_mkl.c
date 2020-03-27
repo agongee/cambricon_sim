@@ -21,11 +21,17 @@ int main(){
     float *weight, *weight_temp, *weight_thresh_temp, *thresh; // weight
     float *identity; // I
     float *computation_temp, *u, *b, *b_temp;
+    float *neg_half;
     float thresh_temp;
     int i, j, loop;
 
     v_num = 5;
     v_comp = 100;
+
+    neg_half = (float *)mkl_malloc(v_comp*sizeof(float), 32);
+    for(i = 0; i < v_comp; i++){
+        neg_half[i] = -0.5;
+    }
 
     vects = (float *)mkl_calloc(v_num*v_comp, sizeof(float), 32);
     in = (float *)mkl_malloc(v_comp*sizeof(float), 32);
@@ -101,23 +107,15 @@ int main(){
         weight_thresh_temp = weight;
 
         for(i = 0; i < v_comp; i++){
-            thresh_temp = 0;
-            for(j = 0; j < v_comp; j++){
-                thresh_temp += *weight_thresh_temp;
-                weight_thresh_temp += 1;
-            }
-            thresh[i] = (-0.5) *  thresh_temp;
-        }
-
-        weight_thresh_temp = weight;
-
-        for(i = 0; i < v_comp; i++){
-            vsMul(v_comp, weight_thresh_temp, in, computation_temp);
-            for(j = 0; j < v_comp; j++){
-                u[i] += computation_temp[j];
-            }
+            vsAdd(v_comp, thresh, weight_thresh_temp, thresh);
             weight_thresh_temp += v_comp;
         }
+        vsMul(v_comp, thresh, thresh, neg_half);
+
+        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                v_comp, 1, v_comp, 1, weight, v_comp, in, 1, 1, u, 1);
+        
+        vsAdd(v_comp, u, thresh, u);
         
         for(i = 0; i < v_comp; i++){
             if(u[i] > 0){

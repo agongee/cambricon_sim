@@ -1,0 +1,58 @@
+//vector component(100)
+SLOAD   $0,     #10000
+SLOAD   $1,     #100
+
+//input vector addr (b(t)) (at vector)
+SLOAD   $2,     #0
+//weight matrix addr (at vector)
+//store in col-major order
+SLOAD   $3,     #100
+//threshold vector addr (at vector)
+SLOAD   $4,     #10100
+//u vector addr (at vector)
+SLOAD   $5,     #10200
+
+//weight matrix addr (at matrix)
+SLOAD   $8,     #0
+
+//input load
+VLOAD   $2,     $1,     #100
+//weight load (at vector)
+VLOAD   $3,     $0,     #200
+//weight load (at matrix)
+MLOAD   $4,     $0,     #300
+
+//loop couter, init to 101
+SMOVE   $6,     $1
+SADD    $6,     $6,     #1
+//weight matrix addr load
+SMOVE   $7,     $3
+SSUB    $7,     $7,     $1
+SADD    $7,     $7,     $1
+//sum each weight matrix column
+VAV     $4,     $1,     $7,     $4
+
+//loop counter dec
+SADD    $6,     $6,     #-1
+
+//branch check
+CB      #-4,    $6
+//-2 div
+VDS     $4,     $1,     $4,     #-2
+
+//u compute
+MMV     $5,     $1,     $8,     $2,     $1
+VAV     $5,     $1,     $5,     $4
+
+//zero vector
+SLOAD   $10,    #10400
+VSV     $10,    $1,     $10,    $10
+
+SLOAD   $11,    #10500
+VGT     $11,    $1,     $5,     $10
+
+SLOAD   $12,    #10600
+VE      $12,    $1,     $5,     $10
+
+VMV     $12,    $1,     $12,    $1
+VAV     $2,     $1,     $11,    $12
