@@ -12,11 +12,11 @@ If there is ImportError, check the libraries written below.
 python simul.py --src {cambricon instruction source file} --cfg {accelerator configuration file}
 
 [Source File]
-Cambricon instruction source files which implements MLP, CNN, RNN, LSTM respectively are provided in src folder
+Cambricon instruction source files which implements MLP, CNN, RNN, LSTM, AE, HNN, SOM respectively are provided in src folder
 
 [Config]
 The parameters which are not provided from the paper can be set by configuration file.
 Check config/default.cfg as an example.
 
 [CPU Baseline]
-CPU baseline codes for MLP, CNN, RNN, LSTM are provided in cpu_src folder.
+CPU baseline codes for MLP, CNN, RNN, LSTM, AE, HNN, SOM are provided in cpu_src folder.
