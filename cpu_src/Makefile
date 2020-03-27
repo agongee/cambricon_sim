@@ -1,6 +1,6 @@
 CC = gcc
 LDFLAGS = -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
-TARGET = mlp_mkl cnn_mkl rnn_mkl lstm_mkl som_mkl autoencoder_mkl
+TARGET = mlp_mkl cnn_mkl rnn_mkl lstm_mkl som_mkl autoencoder_mkl hnn_mkl
 
 all: $(TARGET)
 
@@ -21,6 +21,9 @@ som_mkl:
 
 autoencoder_mkl:
 	$(CC) -o autoencoder_mkl autoencoder_mkl.c $(LDFLAGS)
+
+hnn_mkl:
+	$(CC) -o hnn_mkl hnn_mkl.c $(LDFLAGS)
 
 clean:
 	rm $(TARGET)
