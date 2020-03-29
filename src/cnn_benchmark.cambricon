@@ -4,11 +4,17 @@
 
 // input(1@32x32)  -  C1(6@28x28,  K:  6@5x5)
 // address, size
+// input addr
 SLOAD   $1, #0
+// input size
 SLOAD   $2, #19600 
+// kernel addr
 SLOAD   $3, #19600
+// single kernel size
 SLOAD   $4, #25
+// output addr
 SLOAD   $5, #19750
+// output size
 SLOAD   $6, #784
 // $7 -> output addr, $5 -> output base
 // $8 -> total size 784 * 6
@@ -22,16 +28,22 @@ MLOAD   $1, $2, #1000
 // computation
 SMOVE   $7, $5
 // repeat for 6 times (channels)
+// counter <- 7
 SLOAD   $0, #7
+// load whole kernel
 VLOAD   $3, $4, #1100
+// compute
 MMV     $7, $6, $1, $3, $4
 VEXP    $30, $6, $7
 VAS     $31, $6, $30, #1
 VDV     $7, $6, $30, $31
+// point to next kernel addr
 SADD    $3, $3, $4
+// point to next output addr
 SADD    $7, $7, $6
+// counter -= 1
 SADD    $0, $0, #-1
-SADD    $7, $4, $7
+// branch
 CB      #-5,   $0
 SMUL    $8, $6, #6
 MSTORE  $7, $8, #100
@@ -90,7 +102,6 @@ VDV     $7, $6, $30, $31
 SADD    $3, $3, $4
 SADD    $7, $7, $6
 SADD    $0, $0, #-1
-SADD    $7, $4, $7
 CB      #-5,   $0
 SMUL    $8, $6, #16
 MSTORE  $7, $8, #100
